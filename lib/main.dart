@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_intro/flutter_intro.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import 'interactive_example.dart';
@@ -48,7 +49,9 @@ class _MainMenuState extends State<MainMenu> {
               child: const Text("Custom widget example"),
               onPressed: () => pushNewScreen(
                 context,
-                screen: const CustomWidgetExample(),
+                screen: Intro(
+                  child: const CustomWidgetExample(),
+                ),
               ),
             ),
           ),
@@ -339,13 +342,45 @@ class _CustomWidgetExampleState extends State<CustomWidgetExample> {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home),
+        icon: IntroStepBuilder(
+          padding: const EdgeInsets.only(
+            top: 8,
+            bottom: 20,
+            left: 12,
+            right: 12,
+          ),
+          order: 1,
+          overlayBuilder: (params) {
+            return ElevatedButton(
+              onPressed: () {
+                params.onNext?.call();
+                _controller.jumpToTab(1);
+              },
+              child: const Text('To Search'),
+            );
+          },
+          builder: (context, key) {
+            return Icon(
+              Icons.home,
+              key: key,
+            );
+          },
+        ),
         title: "Home",
         activeColorPrimary: Colors.blue,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(Icons.search),
+        icon: IntroStepBuilder(
+          order: 2,
+          text: 'This is step 2',
+          builder: (context, key) {
+            return Icon(
+              Icons.search,
+              key: key,
+            );
+          },
+        ),
         title: ("Search"),
         activeColorPrimary: Colors.teal,
         inactiveColorPrimary: Colors.grey,
@@ -369,6 +404,17 @@ class _CustomWidgetExampleState extends State<CustomWidgetExample> {
         inactiveColorPrimary: Colors.grey,
       ),
     ];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(
+      const Duration(milliseconds: 600),
+      () {
+        Intro.of(context).start();
+      },
+    );
   }
 
   @override
